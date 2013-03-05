@@ -43,7 +43,7 @@ int main()
 	strcpy(buffer, "Starting!\n");
 	serial_send_blocking(USB_COMM, buffer, strlen(buffer));
 
-   /* And start the motor spinning.                                           */
+	/* And start the motor spinning.                                           */
 
 	set_m2_speed(motor_speed);
 
