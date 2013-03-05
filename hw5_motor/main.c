@@ -29,12 +29,10 @@ int main()
 
 	/**** Begin Function Definition ****/
 
-	/* Initialize the encoders and start the moter spinning.  M1 values are    */
-	/* bogus and can be ignored.                                               */
+	/* Initialize the encoders.  M1 values are bogus and can be ignored.       */
 
 	encoders_init(IO_B4, IO_B3, IO_C1, IO_C0);
 	encoders_get_counts_and_reset_m2();
-	set_m2_speed(motor_speed);
 
 	/* Initialize serial communication.                                        */
 
@@ -44,6 +42,10 @@ int main()
 
 	strcpy(buffer, "Starting!\n");
 	serial_send_blocking(USB_COMM, buffer, strlen(buffer));
+
+   /* And start the motor spinning.                                           */
+
+	set_m2_speed(motor_speed);
 
 	/* Loop until the user presses any of the three buttons on the board.      */
 
