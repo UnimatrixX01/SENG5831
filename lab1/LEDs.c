@@ -3,6 +3,7 @@
 
 #include <avr/io.h>
 #include <stdio.h>
+#include <pololu/orangutan.h>
 
 // RED LED is toggled in a cyclic executive defined in lab1.c
 // Yellow and Green are toggled in interrupt handlers defined below.
@@ -25,26 +26,33 @@ void init_LEDs() {
 	int i;
 
 	// Clear all data direction ports
->
+	DD_REG_GREEN = 0;
+	DD_REG_RED = 0;
+	//DD_REG_YELLOW = 0;
 
 	// Configure data direction as output
->
+	DD_REG_RED |= BIT_RED;
+	DD_REG_GREEN |= BIT_GREEN;
+	//DD_REG_YELLOW |= BIT_YELLOW;
 
 	// Turn LEDs on to make sure they are working
->
+	LED_ON(RED);
+	LED_ON(GREEN);
+	//LED_ON(YELLOW);
 
 	// leave on for 2 seconds
 	for (i=0;i<200;i++)
 		WAIT_10MS;
 
 	// Start all LEDs off
->
+	LED_OFF(RED);
+	LED_OFF(GREEN);
+	//LED_OFF(YELLOW);
 
 	// clear toggle counters
 	G_green_toggles = 0;
 	G_red_toggles = 0;
 	G_yellow_toggles = 0;
-	
 }
 
 /*

@@ -15,7 +15,6 @@ extern uint16_t G_yellow_period;
 extern uint16_t G_release_red;
 
 void init_timers() {
-/*
 	// -------------------------  RED --------------------------------------//
 	// Software Clock Using Timer/Counter 0.
 	// THE ISR for this is below.
@@ -23,22 +22,25 @@ void init_timers() {
 	// SET appropriate bits in TCCR....
 
 	// Using CTC mode with OCR0 for TOP. This is mode X, thus WGM0/1/0 = .
->
+	TCCR0A &= ~(1 << WGM00);
+	TCCR0A |= (1 << WGM01);
+	TCCR0B &= ~(1 << WGM02);
+
+	// Using pre-scaler 256. This is CS0/1/0/0 = 
+	TCCR0B |= (1 << CS02);
+	TCCR0B &= ~(1 << CS01);
+	TCCR0B &= ~(1 << CS00);
 	
-	// Using pre-scaler XX. This is CS0/2/1/0 = 
->
-	
-	// Software Clock Interrupt Frequency: 1000 = f_IO / (prescaler*OCR0)
+	// Software Clock Interrupt Frequency: 1000 = f_IO / (prescaler*(OCR0+1))
 	// Set OCR0 appropriately for TOP to generate desired frequency of 1KHz
 	printf("Initializing software clock to freq 1000Hz (period 1 ms)\n");	
->	OCR0 = ;
+	OCR0A = 77;
 
 	//Enable output compare match interrupt on timer 0A
->
+	TIMSK0 |= (1 << OCIE0A);
 
 	// Initialize counter
 	G_ms_ticks = 0;
-*/
 
 	//--------------------------- YELLOW ----------------------------------//
 	// Set-up of interrupt for toggling yellow LEDs. 
@@ -106,9 +108,8 @@ void init_timers() {
 
 }
 
-/*
 //INTERRUPT HANDLERS
-> ISR(XXXX) {
+ISR(TIMER0_COMPA_vect) {
 
 	// This is the Interrupt Service Routine for Timer0 (10ms clock used for scheduling red).
 	// Each time the TCNT count is equal to the OCR0 register, this interrupt is "fired".
@@ -120,4 +121,3 @@ void init_timers() {
 	if ( ( G_ms_ticks % G_red_period ) == 0 )
 		G_release_red = 1;
 }
-*/

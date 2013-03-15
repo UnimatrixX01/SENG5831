@@ -9,7 +9,7 @@
 #include <inttypes.h> //gives us uintX_t
 
 // number of empty for loops to eat up about 1 ms
-#define FOR_COUNT_10MS 
+#define FOR_COUNT_10MS 10000
 
 uint32_t __ii;
 

@@ -6,7 +6,7 @@ DEVICE ?= atmega168
 MCU ?= atmega168
 AVRDUDE_DEVICE ?= m168
 
-CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) $(DEVICE_SPECIFIC_CFLAGS) -Os
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) $(DEVICE_SPECIFIC_CFLAGS)
 CC=avr-gcc
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax

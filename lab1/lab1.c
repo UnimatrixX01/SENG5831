@@ -79,29 +79,29 @@ int main(void) {
 		/* BEGIN with a simple toggle using for-loops. No interrupt timers */
 
 		// toggle the LED. Increment a counter.
+		/*
 		LED_TOGGLE(RED);
 		G_red_toggles++;
-		length = sprintf( tempBuffer, "R toggles %d\r\n", G_red_toggles );
+		length = sprintf( tempBuffer, "R toggles %ld\r\n", G_red_toggles );
 		print_usb( tempBuffer, length );
 #ifdef ECHO2LCD
 		lcd_goto_xy(0,0);
-		printf("R:%d ",G_red_toggles);
+		printf("R:%ld ",G_red_toggles);
 #endif
 
 		// create a for-loop to kill approximately 1 second
 		for (i=0;i<100;i++) {
 			WAIT_10MS;
 		}
+		*/
 				
 		// ONCE THAT WORKS, Comment out the above and use a software timer
 		//	to "schedule" the RED LED toggle.
-/*
 		if (G_release_red) {
 			LED_TOGGLE(RED);
 			G_red_toggles++;
 			G_release_red = 0; 
 		}
-*/
 
 		// Whenever you are ready, add in the menu task.
 		// Think of this as an external interrupt "releasing" the task.
