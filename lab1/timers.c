@@ -1,6 +1,7 @@
 #include "timer.h"
 #include "LEDs.h"
 
+#include <stdio.h>
 #include <avr/interrupt.h>
 
 // GLOBALS
@@ -50,27 +51,31 @@ void init_timers() {
 	// Obviously, we could use a single timer to schedule everything, but we are experimenting here!
 	// THE ISR for this is in the LEDs.c file
 
-/*
-	// SET appropriate bits in TCCR ...
+	// This timer should have a period of 100ms
+	// Software Clock Interrupt Frequency: 10 = f_IO / (prescaler*(OCR3+1))
 
-	// Using CTC mode with OCR3A for TOP. This is mode XX, thus WGM1/3210 = .
->
-	
-	// Using pre-scaler XX. This is CS1_210 = 
->
+	// Using CTC mode with OCR3 for TOP. WGMn3/2/1/0 to 0/1/0/0
+	TCCR3B &= ~(1 << WGM33);
+	TCCR3B |=  (1 << WGM32);
+	TCCR3A &= ~(1 << WGM31);
+	TCCR3A &= ~(1 << WGM30);
 
+	// Using pre-scaler 64. This is CS0/1/0/0 = 0/1/1
+	// Set the prescaler to 64 and OCRn0 to 31,249
+	TCCR3B &= ~(1 << CS32);
+	TCCR3B |=  (1 << CS31);
+	TCCR3B |=  (1 << CS30);
 
-	// Interrupt Frequency: 10 = f_IO / (prescaler*OCR3A)
-	// Set OCR3A appropriately for TOP to generate desired frequency using Y_TIMER_RESOLUTION (100 ms).
-	// NOTE: This is not the toggle frequency, rather a tick frequency used to time toggles.
->	OCR3A = 
->	printf("Initializing yellow clock to freq %dHz (period %d ms)\n",(int)(XXX),Y_TIMER_RESOLUTION);	
+	// Set TOP value to 31249
+	OCR3AH = 0x7A;
+	OCR3AL = 0x11;
+
+	//	printf("Initializing yellow clock to freq %dHz (period %d ms)\n",(int)(10),Y_TIMER_RESOLUTION);	
 
 	//Enable output compare match interrupt on timer 3A
->
+	TIMSK3 |= (1 << OCIE3A);
 
 	G_yellow_ticks = 0;
-*/
 /*
 	//--------------------------- GREEN ----------------------------------//
 	// Set-up of interrupt for toggling green LED. 

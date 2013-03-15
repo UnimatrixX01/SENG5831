@@ -22,19 +22,19 @@
 */
 
 // define the data direction registers
-#define DD_REG_RED	  DDRD
+#define DD_REG_RED	  DDRA
 #define DD_REG_YELLOW DDRA
-#define DD_REG_GREEN  DDRC
+#define DD_REG_GREEN  DDRD
 
 // define the output ports by which you send signals to the LEDs
-#define PORT_RED     PORTD
+#define PORT_RED     PORTA
 #define PORT_YELLOW  PORTA
-#define PORT_GREEN   PORTC
+#define PORT_GREEN   PORTD
 
 // define the bit-masks for each port that the LEDs are attached to
-#define BIT_RED      ( 1 << 1)
-#define BIT_YELLOW   ( 1 << 0)
-#define BIT_GREEN    ( 1 << 4)
+#define BIT_RED      ( 1 << PORTA2)
+#define BIT_YELLOW   ( 1 << PORTA0)
+#define BIT_GREEN    ( 1 << PORTD5)
 
 // define "function" calls for turning LEDs on and off
 #define LED_ON(x)     (PORT_##x |= BIT_##x)

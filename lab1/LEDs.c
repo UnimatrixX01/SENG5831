@@ -28,17 +28,17 @@ void init_LEDs() {
 	// Clear all data direction ports
 	DD_REG_GREEN = 0;
 	DD_REG_RED = 0;
-	//DD_REG_YELLOW = 0;
+	DD_REG_YELLOW = 0;
 
 	// Configure data direction as output
 	DD_REG_RED |= BIT_RED;
 	DD_REG_GREEN |= BIT_GREEN;
-	//DD_REG_YELLOW |= BIT_YELLOW;
+	DD_REG_YELLOW |= BIT_YELLOW;
 
 	// Turn LEDs on to make sure they are working
 	LED_ON(RED);
 	LED_ON(GREEN);
-	//LED_ON(YELLOW);
+	LED_ON(YELLOW);
 
 	// leave on for 2 seconds
 	for (i=0;i<200;i++)
@@ -47,7 +47,7 @@ void init_LEDs() {
 	// Start all LEDs off
 	LED_OFF(RED);
 	LED_OFF(GREEN);
-	//LED_OFF(YELLOW);
+	LED_OFF(YELLOW);
 
 	// clear toggle counters
 	G_green_toggles = 0;
@@ -106,22 +106,24 @@ void set_toggle(char color, int ms) {
 }
 */
 
-/* 
 // INTERRUPT Names are defined in iom1284p.h
 
 // INTERRUPT HANDLER for yellow LED
-> ISR(XXXX) {
+ISR(TIMER3_COMPA_vect) {
 
 	// This the Interrupt Service Routine for Toggling the yellow LED.
 	// Each time the TCNT count is equal to the OCRxx register, this interrupt is enabled.
 	// At creation of this file, it was initialized to interrupt every 100ms (10Hz).
 	//
 	// Increment ticks. If it is time, toggle YELLOW and increment toggle counter.
->
->
->
+	G_yellow_ticks++;
 
+	if ( ( G_yellow_ticks % G_yellow_period ) == 0 ) {
+		LED_TOGGLE(YELLOW);
+		G_yellow_toggles++;
+	}
 }
+/*
 
 // INTERRUPT HANDLER for green LED
 > ISR(XXXX) {

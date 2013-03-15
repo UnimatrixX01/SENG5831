@@ -6,7 +6,7 @@ DEVICE ?= atmega168
 MCU ?= atmega168
 AVRDUDE_DEVICE ?= m168
 
-CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) $(DEVICE_SPECIFIC_CFLAGS)
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) $(DEVICE_SPECIFIC_CFLAGS) -Os
 CC=avr-gcc
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax
@@ -19,13 +19,16 @@ OBJECT_FILES=lab1.o LEDs.o timers.o menu.o
 
 all: $(TARGET).hex
 
+assembly: $(OBJECT_FILES:.o=.asm)
+	
 clean:
-	rm -f *.o *.hex *.obj *.hex
+	rm -f *.o *.hex *.obj *.hex *.asm
+
+%.asm: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c -Wa,-a,-ad $< > $@
 
 %.hex: $(TARGET).obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
-
-lab1.o: lab1.c
 
 %.obj: $(OBJECT_FILES)
 	$(CC) $(CFLAGS) $(OBJECT_FILES) $(LDFLAGS) -o $@

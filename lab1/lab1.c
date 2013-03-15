@@ -22,7 +22,7 @@ volatile uint32_t G_ms_ticks = 0;
 
 volatile uint16_t G_red_period = 1000;
 volatile uint16_t G_green_period = 1000;
-volatile uint16_t G_yellow_period = 1000;
+volatile uint16_t G_yellow_period = 100;
 
 volatile uint16_t G_release_red = 0;
 

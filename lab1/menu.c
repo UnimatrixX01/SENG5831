@@ -29,8 +29,6 @@ void print_usb( char *buffer, int n ) {
 // This immediately readies the board for serial comm
 void init_menu() {
 	
-	char printBuffer[32];
-	
 	// Set the baud rate to 9600 bits per second.  Each byte takes ten bit
 	// times, so you can get at most 960 bytes per second at this speed.
 	serial_set_baud_rate(USB_COMM, 9600);
@@ -95,19 +93,19 @@ void process_received_string(const char* buffer)
 		case 'p':
 			switch(color) {
 				case 'R': 
-					length = sprintf( tempBuffer, "R toggles: %d\r\n", G_red_toggles );
+					length = sprintf( tempBuffer, "R toggles: %ld\r\n", G_red_toggles );
 					print_usb( tempBuffer, length ); 
 					break;
 				case 'G': 
-					length = sprintf( tempBuffer, "G toggles: %d\r\n", G_green_toggles );
+					length = sprintf( tempBuffer, "G toggles: %ld\r\n", G_green_toggles );
 					print_usb( tempBuffer, length ); 
 					break;
 				case 'Y': 
-					length = sprintf( tempBuffer, "Y toggles: %d\r\n", G_yellow_toggles );
+					length = sprintf( tempBuffer, "Y toggles: %ld\r\n", G_yellow_toggles );
 					print_usb( tempBuffer, length ); 
 					break;
 				case 'A': 
-					length = sprintf( tempBuffer, "Toggles R:%d G:%d Y:%d\r\n", G_red_toggles, G_green_toggles, G_yellow_toggles );
+					length = sprintf( tempBuffer, "Toggles R:%ld G:%ld Y:%ld\r\n", G_red_toggles, G_green_toggles, G_yellow_toggles );
 					print_usb( tempBuffer, length ); 
 					break;
 				default: print_usb("Default in p(color). How?\r\n", 27 );
@@ -143,7 +141,7 @@ void check_for_new_bytes_received()
 	serial_get_received_bytes is an array index that marks where in the buffer the most current received character resides. 
 	receive_buffer_position is an array index that marks where in the buffer the most current PROCESSED character resides. 
 	Both of these are incremented % (size-of-buffer) to move through the buffer, and once the end is reached, to start back at the beginning.
-	This process and data structures are from the Pololu library. See examples/serial2/test.c and src/OrangutanSerial/*.*
+	This process and data structures are from the Pololu library. See examples/serial2/test.c and src/OrangutanSerial/ *.*
 	
 	A carriage return from your comm window initiates the transfer of your keystrokes.
 	All key strokes prior to the carriage return will be processed with a single call to this function (with multiple passes through this loop).
