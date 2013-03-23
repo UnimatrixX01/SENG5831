@@ -67,8 +67,7 @@ void init_timers() {
 	TCCR3B |=  (1 << CS30);
 
 	// Set TOP value to 31249
-	OCR3AH = 0x7A;
-	OCR3AL = 0x11;
+	OCR3A = 31249;
 
 	//	printf("Initializing yellow clock to freq %dHz (period %d ms)\n",(int)(10),Y_TIMER_RESOLUTION);	
 
@@ -76,7 +75,7 @@ void init_timers() {
 	TIMSK3 |= (1 << OCIE3A);
 
 	G_yellow_ticks = 0;
-/*
+
 	//--------------------------- GREEN ----------------------------------//
 	// Set-up of interrupt for toggling green LED. 
 	// This "task" is implemented in hardware, because the OC1A pin will be toggled when 
@@ -84,33 +83,38 @@ void init_timers() {
 	//      Timer/Counter 1 to OCR1A.
 	// We will keep track of the number of matches (thus toggles) inside the ISR (in the LEDs.c file)
 	// Limits are being placed on the frequency because the frequency of the clock
-	// used to toggle the LED is limited.
-
-	// Using CTC mode with OCR1A for TOP. This is mode XX, thus WGM3/3210 = .
->
-
-	// Toggle OC1A on a compare match. Thus COM1A_10 = 01
->
 	
-	// Using pre-scaler 1024. This is CS1/2/1/0 = XXX
->
+	// Using CTC mode with OCR3 for TOP. WGMn3/2/1/0 to 0/1/0/0
+	TCCR1B &= ~(1 << WGM13);
+	TCCR1B |=  (1 << WGM12);
+	TCCR1A &= ~(1 << WGM11);
+	TCCR1A &= ~(1 << WGM10);
 
-	// Interrupt Frequency: ? = f_IO / (1024*OCR1A)
+	// Using pre-scaler 64. This is CS1/2/1/0 = 1/0/1
+	// Set the prescaler to 64 and OCRn0 to 31,249
+	TCCR1B |=  (1 << CS12);
+	TCCR1B &= ~(1 << CS11);
+	TCCR1B |=  (1 << CS10);
+
+	// Toggle OC1A on Compare Match
+	TCCR1A &= ~(1 << COM1A1);
+	TCCR1A |=  (1 << COM1A0);
+
+	// Interrupt Frequency: 1/G_green_period = f_IO / (1024*OCR1A)
 	// Set OCR1A appropriately for TOP to generate desired frequency.
 	// NOTE: This IS the toggle frequency.
 	printf("green period %d\n",G_green_period);
->	OCR1A = (uint16_t) (XXXX);
+	OCR1A = (uint16_t)((float)(20000000.0 / (1000.0*1024)) * G_green_period);
+
 	printf("Set OCR1A to %d\n",OCR1A);
->	printf("Initializing green clock to freq %dHz (period %d ms)\n",(int)(XXXX),G_green_period);	
+	printf("Initializing green clock to freq %dHz (period %d ms)\n",(int)(1000/G_green_period),G_green_period);
 
 	// A match to this will toggle the green LED.
 	// Regardless of its value (provided it is less than OCR1A), it will match at the frequency of timer 1.
 	OCR1B = 1;
 
 	//Enable output compare match interrupt on timer 1B
->
-*/
-
+	TIMSK1 |= (1 << OCIE1B);
 }
 
 //INTERRUPT HANDLERS
@@ -123,6 +127,7 @@ ISR(TIMER0_COMPA_vect) {
 	G_ms_ticks++;
 
 	// if time to toggle the RED LED, set flag to release
-	if ( ( G_ms_ticks % G_red_period ) == 0 )
+	if ( ( G_ms_ticks % G_red_period ) == 0 ) {
 		G_release_red = 1;
+	}
 }

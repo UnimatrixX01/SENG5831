@@ -55,7 +55,6 @@ void init_LEDs() {
 	G_yellow_toggles = 0;
 }
 
-/*
 void set_toggle(char color, int ms) {
 
 		// check toggle ms is positive and multiple of 100
@@ -72,39 +71,50 @@ void set_toggle(char color, int ms) {
 		// For each color, if ms is 0, turn it off by changing data direction to input.
 		// If it is >0, set data direction to output.
 		if ((color=='R') || (color=='A')) {
-			if (ms==0)
->				
-			else
->				
+			if (ms==0) {
+				DD_REG_RED &= ~BIT_RED;
+			} else {
+				DD_REG_RED |=  BIT_RED;
+			}
 			G_red_period = ms;
 		}
 
 		if ((color=='Y') || (color=='A')) {
-			if (ms==0)
->				
-			else
->				
+			if (ms==0) {
+				DD_REG_YELLOW &= ~BIT_YELLOW;
+			} else {
+				DD_REG_YELLOW |=  BIT_YELLOW;
+			}
 			G_yellow_period = ms;
 		}
 
 		if ((color=='G') || (color=='A')) {
-			if (ms==0)
->				
-			else
->				
+			if (ms==0) {
+				DD_REG_GREEN &= ~BIT_GREEN;
+			} else {
+				DD_REG_GREEN |=  BIT_GREEN;
+			}
 
 			// green has a limit on its period.
-			if ( ms > 4000) ms = 4000;
+			if ( ms > 4000) {
+				ms = 4000;
+			}
+
 			G_green_period = ms;
 			
 			// set the OCR1A (TOP) to get (approximately) the requested frequency.
 			if ( ms > 0 ) {
->				OCR1A = 
->				printf("Green to toggle at freq %dHz (period %d ms)\n", XXXXX ,G_green_period);	
+				OCR1A = (uint16_t)((float)(20000000.0 / (1000.0*1024)) * G_green_period);
+
+				// Clear the current counter so if the period is decreasing, 
+				// we don't have to wait until the timer overflows to start
+				// the timer.
+				TCNT1 = 0;
+
+				printf("Green to toggle at freq %dHz (period %d ms)\n", (int)(1000/G_green_period) ,G_green_period);	
 			}
  		}
 }
-*/
 
 // INTERRUPT Names are defined in iom1284p.h
 
@@ -118,15 +128,14 @@ ISR(TIMER3_COMPA_vect) {
 	// Increment ticks. If it is time, toggle YELLOW and increment toggle counter.
 	G_yellow_ticks++;
 
-	if ( ( G_yellow_ticks % G_yellow_period ) == 0 ) {
+	if ( ( (G_yellow_ticks*100) % G_yellow_period ) == 0 ) {
 		LED_TOGGLE(YELLOW);
 		G_yellow_toggles++;
 	}
 }
-/*
 
 // INTERRUPT HANDLER for green LED
-> ISR(XXXX) {
+ISR(TIMER1_COMPB_vect) {
 
 	// This the Interrupt Service Routine for tracking green toggles. The toggling is done in hardware.
 	// Each time the TCNT count is equal to the OCRxx register, this interrupt is enabled.
@@ -134,5 +143,3 @@ ISR(TIMER3_COMPA_vect) {
 	
 	G_green_toggles++;
 }
-
-*/

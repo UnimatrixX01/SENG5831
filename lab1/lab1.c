@@ -22,7 +22,7 @@ volatile uint32_t G_ms_ticks = 0;
 
 volatile uint16_t G_red_period = 1000;
 volatile uint16_t G_green_period = 1000;
-volatile uint16_t G_yellow_period = 100;
+volatile uint16_t G_yellow_period = 1000;
 
 volatile uint16_t G_release_red = 0;
 
@@ -58,11 +58,11 @@ int main(void) {
 	//	
 	// --------------------------------------------------------------
 
-	int i;
 
 	// Used to print to serial comm window
-	char tempBuffer[32];
-	int length = 0;
+	//char tempBuffer[32];
+	//int length = 0;
+	//int i;
 	
 	// Initialization here.
 	lcd_init_printf();	// required if we want to use printf() for LCD printing
@@ -105,11 +105,8 @@ int main(void) {
 
 		// Whenever you are ready, add in the menu task.
 		// Think of this as an external interrupt "releasing" the task.
-/*
 		serial_check();
 		check_for_new_bytes_received();
-*/
-					
 	} //end while loop
 } //end main
 

@@ -86,8 +86,9 @@ void process_received_string(const char* buffer)
 		// change toggle frequency for <color> LED
 		case 'T':
 		case 't':
-// >			//set_toggle(color,value);
+			set_toggle(color,value);
 			break; 
+
 		// print counter for <color> LED 
 		case 'P':
 		case 'p':
