@@ -26,7 +26,7 @@ void CMotor::init() {
 
    /* Configure the motor for fast PWM.                                    */
 
-   TCCR2A &= ~(1 << WGM22);
+   TCCR2B &= ~(1 << WGM22);
    TCCR2A |=  (1 << WGM21);
    TCCR2A |=  (1 << WGM20);
 
@@ -56,6 +56,7 @@ void CMotor::setMaxSpeed(uns32 newMaxSpeed) {
 }
 
 void CMotor::setSpeed(int32 newSpeed) {
+
    /* Clamp the speed to the max speed.                                    */
 
    if (newSpeed < -m_max_speed) {
@@ -66,6 +67,7 @@ void CMotor::setSpeed(int32 newSpeed) {
    }
 
    /* Set the direction and motor PWM.                                     */
+
    if (newSpeed < 0) {
       OCR2B = -newSpeed;
       PRT_M2DIR |= BIT_M2DIR;

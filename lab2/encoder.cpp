@@ -1,7 +1,8 @@
 #include <avr/interrupt.h>
 #include "encoder.hpp"
 
-// Motor Encoder Pins
+/* Motor Encoder Pins                                                      */
+
 #define INT_M2ENC1  (PCMSK3)
 #define PIN_M2ENC1  (PIND)
 #define DDR_M2ENC1  (DDRD)
@@ -16,6 +17,8 @@
 #define PCC_M2ENC2  (1 << PCIE3)
 #define PCF_M2ENC2  (1 << PCIF3)
 
+/* Ticks in one revolution of the motor.                                   */
+
 #define TICKS_PER_ROTATION (64)
 
 CEncoder CEncoder::m_encoder;
@@ -28,6 +31,14 @@ CEncoder::~CEncoder() {
 
 CEncoder &CEncoder::get() {
     return m_encoder;
+}
+
+int32 CEncoder::ticksToDegrees(int32 ticks) {
+   return (ticks * 360) / TICKS_PER_ROTATION;
+}
+
+int32 CEncoder::degreesToTicks(int32 deg) {
+   return (deg * TICKS_PER_ROTATION) / 360;
 }
 
 void CEncoder::init() {
@@ -69,6 +80,7 @@ void CEncoder::clearError() {
 }
 
 void CEncoder::update() {
+
    uns8 pin1 = PIN_M2ENC1 & BIT_M2ENC1;
    uns8 pin2 = PIN_M2ENC2 & BIT_M2ENC2;
 

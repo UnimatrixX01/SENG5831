@@ -1,6 +1,8 @@
 #include <avr/interrupt.h>
 #include "logger.hpp"
 #include "pid.hpp"
+#include "interpolator.hpp"
+#include "timer.hpp"
 
 CLogger CLogger::m_logger;
 
@@ -8,6 +10,7 @@ CLogger::CLogger() {
    m_serial = NULL;
    m_logger_enabled = true;
    m_logger_release = false;
+   m_csv = true;
 }
 
 CLogger::~CLogger() {
@@ -21,45 +24,88 @@ void CLogger::setEnabled(boolean isEnabled) {
    m_logger_enabled = isEnabled;
 }
 
+boolean CLogger::isEnabled() {
+   return m_logger_enabled;
+}
+
+boolean CLogger::isCSV() {
+   return m_csv;
+}
+
+void CLogger::toggleCSV() {
+   m_csv = !m_csv;
+   if (m_csv) {
+      printHeader();
+   }
+}
+
+void CLogger::printHeader() {
+   if (m_serial != NULL) {
+      m_serial->printf("Time,Final Dest Ticks,Final Dest Deg,Pr Ticks,Pr Deg,Pm Ticks,Pm Deg,Kp,Kd,Vm,T\r\n");
+   }
+}
+
 void CLogger::init(CSerial *serial) {
 
    /* Save the serial object so the logger knows where to send messages    */
 
    m_serial = serial;
 
+   if (m_csv) {
+      printHeader();
+   }
+
    /************************************************************************/
-   /* Configure the logger to use timer 3 with a 1 second period           */
+   /* Configure the logger to use timer 1 with a 10 milli-second period    */
    /************************************************************************/
 
-   /* Using CTC mode with OCR3 for TOP. WGMn3/2/1/0 to 0/1/0/0             */
+   /* Using CTC mode with OCR1 for TOP.                                    */
 
-   TCCR3B &= ~(1 << WGM13);
-   TCCR3B |=  (1 << WGM12);
-   TCCR3A &= ~(1 << WGM11);
-   TCCR3A &= ~(1 << WGM10);
+   TCCR1B &= ~(1 << WGM13);
+   TCCR1B |=  (1 << WGM12);
+   TCCR1A &= ~(1 << WGM11);
+   TCCR1A &= ~(1 << WGM10);
 
    /* Using pre-scaler 1024.                                               */
 
-   TCCR3B |=  (1 << CS12);
-   TCCR3B &= ~(1 << CS11);
-   TCCR3B |=  (1 << CS10);
+   TCCR1B |=  (1 << CS12);
+   TCCR1B &= ~(1 << CS11);
+   TCCR1B |=  (1 << CS10);
 
-   /* Interrupt Frequency: 1 = f_IO / (x*OCR1A)                            */
-   /* 20000000/(1*x) = OCR3A                                               */
+   /* Interrupt Frequency: 100 = f_IO / (x*OCR1A)                          */
+   /* 20000000/(100*x) = OCR3A                                             */
 
-   OCR3A = 19531;
+   OCR1A = 195;
 
-   /* Enable output compare match interrupt on timer 1B                    */
+   /* Enable output compare match interrupt on timer 1A                    */
 
-   TIMSK3 |= (1 << OCIE3A);
+   TIMSK1 |= (1 << OCIE1A);
 };
 
 void CLogger::update() {
+   char *format;
+
+   /* If it's time to print something to the user, then for the love of    */
+   /* god we better print it.                                              */
+
    if (m_logger_release) {
-      if ((m_serial != NULL) && m_logger_enabled) {
+      if (m_serial != NULL) {
          CPID pid = CPID::get();
-         m_serial->printf("Pr: %ld, Pm: %ld, Kd: %ld, Kp: %ld, Vm: %ld, T: %ld\r\n", 
-                 pid.getPr(), pid.getPm(), pid.getKd(), pid.getKp(), pid.getVm(), pid.getT());
+
+         /* Print in CSV if preferred, otherwise print non-CSV.            */
+
+         if (m_csv) {
+            format = "%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld\r\n";
+         } else {
+            format = "%ld: Final: %ld/%ld, Pr: %ld/%ld, Pm: %ld/%ld, Kp: %ld, Kd: %ld, Vm: %ld, T: %ld\r\n";
+         }
+
+         m_serial->printf(format, 
+                 CTimer::get().getTime(), 
+                 CInterpolator::get().getFinalPr(), CInterpolator::get().getFinalPrDeg(),
+                 pid.getPr(), pid.getPrDeg(),
+                 pid.getPm(), pid.getPmDeg(),
+                 pid.getKp(), pid.getKd(), pid.getVmDeg(), pid.getT());
       }
       m_logger_release = false;
    }
@@ -71,15 +117,10 @@ void CLogger::release() {
 
 /* -------------------------  LOGGER ISR --------------------------------- */
 
-ISR(TIMER3_COMPA_vect) {
-   CLogger::get().release();
-}
-/*
-      if (log_release) {
-         sprintf(buffer, "Pr: %ld, Pm: %ld, Kd: %ld, Kp: %ld, Vm: %ld, T: %ld\r\n", 
-                 Pr, Pm, Kd, Kp, Vm, T);
-         print_usb(buffer, 0);
-         log_release=0;
-      }
+ISR(TIMER1_COMPA_vect) {
+   CTimer::get().update(10);
 
-   */
+   if (CLogger::get().isEnabled()) {
+      CLogger::get().release();
+   }
+}

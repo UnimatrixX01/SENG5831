@@ -5,6 +5,9 @@
 #include "motor.hpp"
 #include "encoder.hpp"
 
+/* This class is responsible for running the PID to control the position   */
+/* of the motor.                                                           */
+
 class CPID {
    private:
       static CPID m_pid;
@@ -20,6 +23,10 @@ class CPID {
 
       int32 m_T;
 
+      int32 m_PmVm;
+
+      uns16 m_vel_upd_cnt;
+
    private:
       CPID();
 
@@ -31,6 +38,7 @@ class CPID {
       void init(CMotor *motor, CEncoder *encoder);
       void update();
 
+      void setPrDeg(int32 newPrDeg);
       void setPr(int32 newPr);
       void setKd(int32 newKd);
       void setKp(int32 newKp);
@@ -41,6 +49,10 @@ class CPID {
       int32 getKp();
       int32 getVm();
       int32 getT();
+
+      int32 getPmDeg();
+      int32 getPrDeg();
+      int32 getVmDeg();
 };
 
 #endif

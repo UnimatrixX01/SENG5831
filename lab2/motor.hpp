@@ -3,6 +3,11 @@
 
 #include "typedef.h"
 
+/* This class is responsible for running the motor.  It will clamp any     */
+/* input motor speeds to the maximum allowed by the timer, as well as stop */
+/* the motor if the speed is below a certain threshold (below which the    */
+/* motor doesn't have enough power to actually move).                      */
+
 class CMotor {
    private:
       uns8 m_still_thresh;

@@ -6,6 +6,11 @@
 
 #define REC_BUFF_SIZE 64
 
+/* This class is responsible for managing the serial USB interface.  It    */
+/* can output a string using standard printf syntax, and it also parses    */
+/* user input to form commands passed back to the application via a        */
+/* callback.                                                               */
+
 class CSerial {
    private:
       char m_recv_buff[REC_BUFF_SIZE];

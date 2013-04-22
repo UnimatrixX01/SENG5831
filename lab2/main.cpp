@@ -7,10 +7,11 @@
 #include "logger.hpp"
 #include "pid.hpp"
 #include "cmd_processor.hpp"
+#include "interpolator.hpp"
 
 int main() {
    CMotor motor;
-   CSerial serial(true);
+   CSerial serial(false);
    CCommandProcessor cmd;
 
    /* First, initialize serial communications.                             */
@@ -26,10 +27,14 @@ int main() {
    CEncoder::get().init();
    CLogger::get().init(&serial);
    CPID::get().init(&motor, &CEncoder::get());
+   CInterpolator::get().init(8);
 
    /* Finally, enable interrupts                                           */
 
    sei();
+
+   /* Most things are done in the ISRs.  But check for serial messages and */
+   /* print log messages here.                                             */
 
    while (1) {
       serial.update();
